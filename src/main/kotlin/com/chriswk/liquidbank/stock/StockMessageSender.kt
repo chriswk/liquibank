@@ -9,12 +9,17 @@ import java.io.File
 import java.time.Instant
 
 @Component
-class StockMessageSender(@Value("\${wine.stock.path}") val stockFile: File, @Value("\${stock.timestamp.file}") val timestampFile: File, val kafkaTemplate: KafkaTemplate<Long, String>, val csvParser: StockCsvParser, val objectMapper: ObjectMapper) {
+class StockMessageSender(@Value("\${wine.stock.path}") val stockFile: File,
+                         @Value("\${stock.timestamp.file}") val timestampFile: File,
+                         val kafkaTemplate: KafkaTemplate<String, String>,
+                         val csvParser: StockCsvParser,
+                         val objectMapper: ObjectMapper) {
     val logger = LoggerFactory.getLogger(StockMessageSender::class.java)
     fun sendLines() {
         if (!timestampFile.exists() || timestampFile.lastModified() < stockFile.lastModified()) {
             csvParser.parseStock().forEach {
-                kafkaTemplate.send("shop.stock.product.${sanity(it.productType)}", it.productId, objectMapper.writeValueAsString(it))
+                kafkaTemplate.send("shop.stock.product.${sanity(it.productType)}", it.productId.toString(), objectMapper.writeValueAsString(it))
+                logger.debug("Sending ${it.productName}")
             }
         } else {
             logger.info("Already processed current file")

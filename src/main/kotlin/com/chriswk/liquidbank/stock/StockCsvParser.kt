@@ -3,10 +3,10 @@ package com.chriswk.liquidbank.stock
 import com.fasterxml.jackson.databind.MappingIterator
 import com.fasterxml.jackson.dataformat.csv.CsvMapper
 import com.fasterxml.jackson.dataformat.csv.CsvSchema
-import okhttp3.HttpUrl
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.io.File
+import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -29,8 +29,8 @@ class StockCsvParser(@Value("\${wine.stock.path}") val stockFile: File) {
                     productName = it.get("Varenavn"),
                     productType = it.get("Varetype"),
                     volume = it.get("Volum"),
-                    price = it.get("Pris"),
-                    pricePerLiter = it.get("Literpris"),
+                    price = it.get("Pris")?.toBigDecimal(),
+                    pricePerLiter = it.get("Literpris")?.toBigDecimal(),
                     selection = it.get("Produktutvalg"),
                     shopCategory = it.get("Butikkategori"),
                     body = it.get("Fylde")?.toInt(),
@@ -65,9 +65,10 @@ class StockCsvParser(@Value("\${wine.stock.path}") val stockFile: File) {
             data.get("Passertil01").orEmpty(),
             data.get("Passertil02").orEmpty(),
             data.get("Passertil03").orEmpty()
-    ).filter { it.isEmpty() }
+    ).filterNot { it.isEmpty() }
 
 
 }
 
 fun String.toZonedDateTime(): ZonedDateTime = LocalDateTime.parse(this, DateTimeFormatter.ISO_DATE_TIME).atZone(ZoneOffset.UTC)
+fun String.toBigDecimal(): BigDecimal = BigDecimal(this.replace(",", "."))

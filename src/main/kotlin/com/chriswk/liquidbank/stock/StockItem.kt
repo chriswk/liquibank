@@ -1,13 +1,13 @@
 package com.chriswk.liquidbank.stock
 
-import okhttp3.HttpUrl
 import org.springframework.data.annotation.Id
 import org.springframework.data.elasticsearch.annotations.Document
+import java.math.BigDecimal
 import java.time.ZonedDateTime
 
 @Document(indexName = "stock")
 data class StockItem(val timestamp: ZonedDateTime, @Id val productId: Long? = null, val productName: String? = null, val productType: String? = null,
-                     val volume: String?, val price: String?, val pricePerLiter: String? = null,
+                     val volume: String?, val price: BigDecimal?, val pricePerLiter: BigDecimal? = null,
                      val selection: String? = null, val shopCategory: String? = null, val body: Int? = null,
                      val freshness: Int? = null, val tannins: Int? = null, val bitterness: Int? = null,
                      val sweetness: Int? = null, val colour: String? = null, val nose: String? = null,

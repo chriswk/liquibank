@@ -1,6 +1,7 @@
 package com.chriswk.liquidbank
 
 import com.chriswk.liquidbank.shopimport.ShopDownloader
+import com.chriswk.liquidbank.shopimport.ShopMessageSender
 import com.chriswk.liquidbank.stock.StockDownloader
 import com.chriswk.liquidbank.stock.StockMessageSender
 import org.springframework.beans.factory.getBean
@@ -16,7 +17,9 @@ fun main(args: Array<String>) {
     val stockDownloader: StockDownloader = ctx.getBean<StockDownloader>()
     val stockMessageSender: StockMessageSender = ctx.getBean<StockMessageSender>()
     val shopDownloader: ShopDownloader = ctx.getBean<ShopDownloader>()
+    val shopMessageSender: ShopMessageSender = ctx.getBean<ShopMessageSender>()
     stockDownloader.refreshCsv()
     shopDownloader.refreshCsv()
     stockMessageSender.sendLines()
+    shopMessageSender.sendLines()
 }

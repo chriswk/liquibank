@@ -18,7 +18,7 @@ class StockMessageSender(@Value("\${wine.stock.path}") val stockFile: File,
     fun sendLines() {
         if (!timestampFile.exists() || timestampFile.lastModified() < stockFile.lastModified()) {
             csvParser.parseStock().forEach {
-                kafkaTemplate.send("shop.stock.product.${sanity(it.productType)}", it.productId.toString(), objectMapper.writeValueAsString(it))
+                kafkaTemplate.send("shop.stock.product", it.productId.toString(), objectMapper.writeValueAsString(it))
                 logger.debug("Sending ${it.productName}")
             }
         } else {
@@ -26,7 +26,5 @@ class StockMessageSender(@Value("\${wine.stock.path}") val stockFile: File,
         }
         timestampFile.writeText(Instant.now().toEpochMilli().toString())
     }
-
-    fun sanity(topicName: String?) = io.prometheus.client.Collector.sanitizeMetricName(topicName)
 
 }
